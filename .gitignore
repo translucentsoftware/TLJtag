@@ -1,0 +1,28 @@
+# xcode noise
+build/
+Build/
+#Ignore subfolder of the xcodeproj dir
+#.xcodeproj/
+
+#Don't ignore the project.pbxproj
+!.xcodeproj/project.pbxproj
+
+# Xcode noise
+*.mode1
+*.mode1v3
+*.mode2v3
+*.perspective
+*.perspectivev3
+*.pbxuser
+*xcuserdata
+
+.svn
+.hg
+
+# osx noise
+*.DS_Store
+profile
+
+*.swp
+*~.nib
+*~
