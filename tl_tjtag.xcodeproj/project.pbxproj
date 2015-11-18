@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		031AB3A31BF8BBE70081F7CC /* tl_jtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 031AB3A11BF8BBE70081F7CC /* tl_jtag.c */; };
-		031AB3A41BF8BBE70081F7CC /* tl_jtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 031AB3A11BF8BBE70081F7CC /* tl_jtag.c */; };
+		031AB3A31BF8BBE70081F7CC /* tl_tjtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */; };
+		031AB3A41BF8BBE70081F7CC /* tl_tjtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */; };
 		032DCBB81BFBAF8500A59410 /* tjtag.c in Sources */ = {isa = PBXBuildFile; fileRef = 032DCBB61BFBAF8500A59410 /* tjtag.c */; };
-		03D5B03D1BF931FA00BBF5A1 /* tl_jtag_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 03D5B03B1BF9316200BBF5A1 /* tl_jtag_test.c */; };
+		03D5B03D1BF931FA00BBF5A1 /* tl_tjtag_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,14 +35,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		031AB3A11BF8BBE70081F7CC /* tl_jtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_jtag.c; path = tl_jtag.c/tl_jtag.c; sourceTree = "<group>"; };
-		031AB3A21BF8BBE70081F7CC /* tl_jtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tl_jtag.h; path = tl_jtag.c/tl_jtag.h; sourceTree = "<group>"; };
+		031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag.c; path = tl_jtag.c/tl_tjtag.c; sourceTree = "<group>"; };
+		031AB3A21BF8BBE70081F7CC /* tl_tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tl_tjtag.h; path = tl_jtag.c/tl_tjtag.h; sourceTree = "<group>"; };
 		032DCBB51BFBAF8500A59410 /* spi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi.h; sourceTree = "<group>"; };
 		032DCBB61BFBAF8500A59410 /* tjtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tjtag.c; sourceTree = "<group>"; };
 		032DCBB71BFBAF8500A59410 /* tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tjtag.h; sourceTree = "<group>"; };
 		038B5CF21BF2966F00BC9A2A /* tl_tjtag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag; sourceTree = BUILT_PRODUCTS_DIR; };
-		038B5D041BF296F100BC9A2A /* tl_jtag_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_jtag_test; sourceTree = BUILT_PRODUCTS_DIR; };
-		03D5B03B1BF9316200BBF5A1 /* tl_jtag_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_jtag_test.c; path = tl_jtag.c/tl_jtag_test.c; sourceTree = "<group>"; };
+		038B5D041BF296F100BC9A2A /* tl_tjtag_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag_test.c; path = tl_jtag.c/tl_tjtag_test.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,9 +76,9 @@
 		038B5CA91BF2939B00BC9A2A = {
 			isa = PBXGroup;
 			children = (
-				031AB3A11BF8BBE70081F7CC /* tl_jtag.c */,
-				031AB3A21BF8BBE70081F7CC /* tl_jtag.h */,
-				03D5B03B1BF9316200BBF5A1 /* tl_jtag_test.c */,
+				031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */,
+				031AB3A21BF8BBE70081F7CC /* tl_tjtag.h */,
+				03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */,
 				032DCBB41BFBAF8500A59410 /* tjtag */,
 				038B5CB31BF2939C00BC9A2A /* Products */,
 			);
@@ -88,7 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				038B5CF21BF2966F00BC9A2A /* tl_tjtag */,
-				038B5D041BF296F100BC9A2A /* tl_jtag_test */,
+				038B5D041BF296F100BC9A2A /* tl_tjtag_test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -127,7 +127,7 @@
 			);
 			name = tl_tjtag_test;
 			productName = "tjtag Tests";
-			productReference = 038B5D041BF296F100BC9A2A /* tl_jtag_test */;
+			productReference = 038B5D041BF296F100BC9A2A /* tl_tjtag_test */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -147,7 +147,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 038B5CAD1BF2939B00BC9A2A /* Build configuration list for PBXProject "tl_jtag" */;
+			buildConfigurationList = 038B5CAD1BF2939B00BC9A2A /* Build configuration list for PBXProject "tl_tjtag" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -171,7 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				032DCBB81BFBAF8500A59410 /* tjtag.c in Sources */,
-				031AB3A31BF8BBE70081F7CC /* tl_jtag.c in Sources */,
+				031AB3A31BF8BBE70081F7CC /* tl_tjtag.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,8 +179,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D5B03D1BF931FA00BBF5A1 /* tl_jtag_test.c in Sources */,
-				031AB3A41BF8BBE70081F7CC /* tl_jtag.c in Sources */,
+				03D5B03D1BF931FA00BBF5A1 /* tl_tjtag_test.c in Sources */,
+				031AB3A41BF8BBE70081F7CC /* tl_tjtag.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,21 +283,21 @@
 		038B5D091BF296F100BC9A2A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = tl_jtag_test;
+				PRODUCT_NAME = tl_tjtag_test;
 			};
 			name = Debug;
 		};
 		038B5D0A1BF296F100BC9A2A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = tl_jtag_test;
+				PRODUCT_NAME = tl_tjtag_test;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		038B5CAD1BF2939B00BC9A2A /* Build configuration list for PBXProject "tl_jtag" */ = {
+		038B5CAD1BF2939B00BC9A2A /* Build configuration list for PBXProject "tl_tjtag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				038B5CB71BF2939C00BC9A2A /* Debug */,

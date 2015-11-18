@@ -8,11 +8,9 @@
 //#define __FreeBSD__       // uncomment only this for FreeBSD
 
 #ifdef __APPLE__    // Josh Gibson
-
-#ifdef DEBUG    // Conflicting Macro
-#undef DEBUG
+#ifdef DEBUG    // Conflicting Macro on OS X
+#undef DEBUG    // it interferese with a variable name
 #endif
-
 #else
 
 #ifdef WINDOWS_VERSION
@@ -50,9 +48,9 @@
 #define FALSE 0
 
 
-#ifdef __APPLE__
+#ifdef __APPLE__    // Josh Gibson
 #define __TL_ARDUINO__
-#include "tl_jtag.h"
+#include "tl_tjtag.h"
 #endif
 
 /* Change me to enable/disable JT MODS */
@@ -61,8 +59,6 @@
 #ifdef USE_JTMODS
 #include "jt_mods.h"
 #endif
-
-
 
 
 static unsigned int ctrl_reg;

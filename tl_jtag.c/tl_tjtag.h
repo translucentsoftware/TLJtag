@@ -1,13 +1,13 @@
 //
-//  tl_jtag.h
-//  tl_jtag
+//  tl_tjtag.h
+//  tl_tjtag
 //
 //  Created by Josh Gibson on 11/15/15.
 //  Copyright © 2015 Translucent Software. All rights reserved.
 //
 
-#ifndef tl_jtag_h
-#define tl_jtag_h
+#ifndef tl_tjtag_h
+#define tl_tjtag_h
 
 #ifdef __APPLE__
 
@@ -46,6 +46,7 @@ bool tljtag_setup_cable_type(int wiggler);
 ArduinoCableType currentCableType(void);
 
 // Set the cable type used for the jtag connection
+// Returns true if is was changed
 bool tljtag_set_cable(ArduinoCableType type);
 
 // Send a byte through the Arduino to the jtag
@@ -63,4 +64,4 @@ void tljtag_shutdown(void);
 #else
 #error "This implementation has only been tested on Macintosh!!"
 #endif /* __APPLE__ */
-#endif /* tl_jtag_h */
+#endif /* tl_tjtag_h */

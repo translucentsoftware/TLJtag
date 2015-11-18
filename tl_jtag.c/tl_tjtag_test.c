@@ -1,6 +1,6 @@
 //
-//  tl_jtag_test.c
-//  tl_jtag
+//  tl_tjtag_test.c
+//  tl_tjtag
 //
 //  Created by Josh Gibson on 11/15/15.
 //  Copyright © 2015 Translucent Software. All rights reserved.
@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "tl_jtag.h"
+#include "tl_tjtag.h"
 
 int main() {
     

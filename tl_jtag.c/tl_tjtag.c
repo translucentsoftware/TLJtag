@@ -1,12 +1,12 @@
 //
-//  tl_jtag.c
-//  tl_jtag
+//  tl_tjtag.c
+//  tl_tjtag
 //
 //  Created by Josh Gibson on 11/15/15.
 //  Copyright © 2015 Translucent Software. All rights reserved.
 //
 
-#include "tl_jtag.h"
+#include "tl_tjtag.h"
 
 #pragma mark - Compiler Directives
 
@@ -43,7 +43,7 @@ int Arduino_FD = -1;
 // Arduino Response Codes
 static const unsigned char R_SEND_SUCCESS = 0x4B;
 static const unsigned char R_RESET_SUCCESS = 0x42;
-static const unsigned char R_INVALID = 0x7F;
+// static const unsigned char R_INVALID = 0x7F; // Not needed currently
 
 // Arduino Command Codes
 static unsigned char LShiftP = 5;
@@ -53,7 +53,7 @@ static unsigned char Arduino_Reset = 0x0;
 #define Arduino_Cable_select (0x3 << LShiftP)
 
 static speed_t BAUDRATE = B9600;
-static const int Arduino_Wait = 5;
+static const int Arduino_Wait = 5; // The number of wait cycles for reading
 // The wait we should expect the for the Arduino
 // It does not seem to like to exceed 9600 baud
 // This wait gives the Arduino enough time to receive the byte,
@@ -61,6 +61,8 @@ static const int Arduino_Wait = 5;
 // lower as at 30 causes errors after a short while
 #define Arduino_Delay (int)((1000000 / BAUDRATE) * 40)
 
+// The underlying cable type, on the Arduino it defaults to
+// the 4 pins TDI TDO TMS TCK
 static ArduinoCableType CurrCableType = Xilinx_Cable_Type;
 
 #define isWigglerCable ((CurrCableType & Wiggler_Cable_Type))
@@ -190,7 +192,7 @@ bool reset_arduino(int fd) {
     bool was_reset = false;
     int tries = 0;
     // Use 8 here because invariable we receive and old invalid number
-    // from the reset, usually only needs to characters
+    // from the reset, usually only needs two characters
     unsigned char buffer[8];
     
     if(fd >=0) {
@@ -209,6 +211,7 @@ bool reset_arduino(int fd) {
             
             if(bytesread < 0) {
                 // During setup the Arduino seems to need extra time
+                // to properly read the reset request
                 if(tries++ < 5)
                     continue;
             } else
@@ -247,15 +250,9 @@ bool set_arduino_cable(ArduinoCableType cable_type)
     return changed;
 }
 
-TL_ALWAYS_INLINE_STATIC void FlushArduinoSerial(void)
-{
-    tcflush  ( Arduino_FD, TCIFLUSH );
-}
-
 TLCString getArduinoFileName(void)
 {
     TLCString file = TLCStringCreate("/dev/tty.usbserial-A603UE5O");
-    
     
     return file;
 }
@@ -294,7 +291,7 @@ bool tljtag_setup_cable_type(int wiggler)
     
     success = tljtag_set_cable((wiggler ? Wiggler_Cable_Type : Xilinx_Cable_Type));
     
-    if(!success)
+    if(!success) // We have a valid setup but can not change the cable type
         tljtag_shutdown();
     
     return success;
@@ -323,11 +320,14 @@ bool tljtag_send_byte(unsigned char byte)
     
     if(!iSSetup()) goto OUT;
     
+    // From JTMod
     *buffer = byte & 0x1F;
     *buffer |= 0x20;
     
     write(Arduino_FD, buffer, 1);
+    
     WaitForArduino();
+    
     bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait);
     
     
@@ -352,6 +352,7 @@ char tljtag_receive_byte(void)
     
     output = Arduino_Read;
     write(Arduino_FD, &output, 1);
+    
     WaitForArduino();
     
     bytesread = read_until(Arduino_FD, &output, 1, 0, Arduino_Wait);
@@ -361,7 +362,7 @@ char tljtag_receive_byte(void)
         exit(EXIT_FAILURE);
     }
     
-    output ^= 0x80;
+    output ^= 0x80; // From JTMod
     
     return output;
 }

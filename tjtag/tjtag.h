@@ -27,7 +27,6 @@
 
 #ifdef __APPLE__ // Josh Gibson
 #include <unistd.h>
-
 #else
 
 #ifndef WINDOWS_VERSION
