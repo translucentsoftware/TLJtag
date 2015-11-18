@@ -1,10 +1,21 @@
+//  Written by Josh Gibson - Translucent Software
+//  josh@translucentsw.com
+// **************************************************************************
 //
-//  tl_tjtag.c
-//  tl_tjtag
+//  This program is copyright (C) 2015 Translucent Software
+//  This program is free software; you can redistribute it and/or modify it
+//  under the terms of version 2 the GNU General Public License as published
+//  by the Free Software Foundation.
+//  This program is distributed in the hope that it will be useful, but WITHOUT
+//  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+//  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+//  more details.
+//  To view a copy of the license go to:
+//  http://www.fsf.org/copyleft/gpl.html
+//  To receive a copy of the GNU General Public License write the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-//  Created by Josh Gibson on 11/15/15.
-//  Copyright © 2015 Translucent Software. All rights reserved.
-//
+// **************************************************************************
 
 #include "tl_tjtag.h"
 

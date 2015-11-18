@@ -1,25 +1,32 @@
 /* Arduino Wiggler Cable Simulator */
 /* Intended for use with tjtag3-0-1 with JTMOD patch. */
 
+/* Josh Gibson/Translucent Software patch for tl_tjtag
+*  Removed all the line numbers and replaced them with constants
+*  Also added the ability to select either a wiggler cable
+*  or the Xilinix style cable that only uses TDO TDI TMS TCK
+*  Arduino serial on OS X can't seem to handle greater than 9600 baud
+*/
+
 typedef
 enum __arduOp
 {
     OP_RESET = 0,
     OP_SEND  = 1,
     OP_READ  = 2,
-    OP_SETCABLE = 3,
+    OP_SETCABLE = 3, // Added for cable set operation - JG
     OP_RSVD  = 4
 }
 arduOp;                                                                                                                                                      
 
-static int WSRST_N = 2;
-static int WTMS = 3;
-static int WTCK = 4;
-static int WTDI = 5;
-static int WRTST_N = 6;
-static int WTDO = 7;
+static const int WSRST_N = 2;
+static const int WTMS = 3;
+static const int WTCK = 4;
+static const int WTDI = 5;
+static const int WRTST_N = 6;
+static const int WTDO = 7;
 
-
+// Added to support Xilinx Cable Type - JG
 static const int TDI = 2;
 static const int TCK = 3;
 static const int TMS = 4;
@@ -30,11 +37,12 @@ static const int Wiggler_Cable_Type = 2;
 
 static int CABLE_TYPE = Xilinx_Cable_Type;
 
-// Return Codes
+// Added Return Codes - JG
 static const int R_SEND_SUCCESS = 0x4B;
 static const int R_RESET_SUCCESS = 0x42;
 static const int R_INVALID = 0x7F;
 
+// Added bulk cable setter - JG
 void setup_cable_state(void)
 {
     // Reset all line states
@@ -44,13 +52,13 @@ void setup_cable_state(void)
          // Pins 0-7 are part of PORTD
         // pins 0 and 1 are RX and TX, respectively
     
-        pinMode(WSRST_N, OUTPUT);     // WSRST_N
-        pinMode(WTMS, OUTPUT);     // WTMS
-        pinMode(WTCK, OUTPUT);     // WTCK
-        pinMode(WTDI, OUTPUT);     // WTDI
-        pinMode(WRTST_N, OUTPUT);     // WTRST_N
+        pinMode(WSRST_N, OUTPUT);
+        pinMode(WTMS, OUTPUT); 
+        pinMode(WTCK, OUTPUT); 
+        pinMode(WTDI, OUTPUT);
+        pinMode(WRTST_N, OUTPUT);
     
-        pinMode(WTDO, INPUT);      // WTDO
+        pinMode(WTDO, INPUT);
   } else {
         pinMode(TDI, OUTPUT);    
         pinMode(TCK, OUTPUT);     
@@ -61,7 +69,7 @@ void setup_cable_state(void)
 
 void setup(void)
 {
-    setup_cable_state();
+    setup_cable_state(); // JG
     Serial.begin(9600);
     //Serial.begin(115200);
 
@@ -130,17 +138,17 @@ void loop(void)
                         readByte = digitalRead(WTDO) == HIGH ?     // WTDO
                                                     B10000000 :     // send back a 1 in bit 7
                                                     B00000000;      // send back a 0 in bit 7
-                } else {
+                } else { // Added for Xilinix style cable - JG
                      readByte = digitalRead(TDO) == HIGH ?     // TDO
-                                                    B00010000 :     // send back a 1 in bit 5
-                                                    B00000000;      // send back a 0 in bit 5
+                                                    B00010000 :     // tjtag expects TDO in bit 5 
+                                                    B00000000;      
                 }
 
                 Serial.write(readByte);
             }
             break;
 
-         case OP_SETCABLE:
+         case OP_SETCABLE: // Added for cable setting instruction - JG
             {
               if(Wiggler_Cable_Type & byte) {
                 CABLE_TYPE = Wiggler_Cable_Type;

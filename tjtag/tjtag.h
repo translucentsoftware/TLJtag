@@ -20,6 +20,7 @@
 // **************************************************************************
 
 /* "JTMOD" modifications to tjtag v3.0.1 by Jeremy Trimble. */
+/* Josh Gibson/ Translucent Software modifications for OS X */
 
 #include <stdio.h>
 #include <stdlib.h>
