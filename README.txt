@@ -1,4 +1,4 @@
-Translucent Software (Josh Gibson) patches to JTMOD and tjtag
+Translucent Software (Josh Gibson) patches to JTMOD and tjtag v3.0.1
 ------------------------------------------------
 
 These patches were done to create a usable Arduino jtag adapter for OS X.
@@ -51,12 +51,13 @@ Example:
 
 ------------------------------------------------
 
-tl_tjtag_tests is a test application that will test turing on the pins. So you can connect LEDs to each
-		pin and validate that it is working.
+tl_tjtag_tests is a test application that will test turing on the pins, so you can connect LEDs to each
+                pin and validate that it is working.
 
 
 ------------------------------------------------
 
-As with the previous version this patch also runs very slow! It most likely is the latency experienced with
-sending to, waiting for and finally receiving back from the Arduino.
+As with the JTMOD, this patch also runs very slow! It most likely is due to the latency experienced with
+sending to, waiting for and finally receiving back from the Arduino. But it works and can keep you from
+spending money on buying a jtag cable.
 
