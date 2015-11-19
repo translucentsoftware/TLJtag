@@ -42,6 +42,7 @@
 		032DCBB71BFBAF8500A59410 /* tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tjtag.h; sourceTree = "<group>"; };
 		038B5CF21BF2966F00BC9A2A /* tl_tjtag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag; sourceTree = BUILT_PRODUCTS_DIR; };
 		038B5D041BF296F100BC9A2A /* tl_tjtag_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		03A4F0AB1BFE180D00E91D5B /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag_test.c; path = tl_jtag.c/tl_tjtag_test.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,6 +82,7 @@
 				03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */,
 				032DCBB41BFBAF8500A59410 /* tjtag */,
 				038B5CB31BF2939C00BC9A2A /* Products */,
+				03A4F0AB1BFE180D00E91D5B /* README.txt */,
 			);
 			sourceTree = "<group>";
 		};

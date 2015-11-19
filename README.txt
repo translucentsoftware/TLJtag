@@ -8,11 +8,14 @@ in order for it to properly communicate with the Arduino and not have any commun
 It is based heavily off the source code of JTMOD (https://github.com/zoobab/tjtag-arduino).
 The serial communication portion was completely rewritten but the Arduino sketch only 
 had slight modifications for clarity and cable selection.
+
+The JTMOD source tree this was based off has been included.
+
 ------------------------------------------------
 
 - OS X only
 This patch only works on OS X but still contains the modifications in tjtag from JTMOD.
-tjtag has also been patched in places to make it compatibility with OS X.
+tjtag has also been patched in places to make it compatibile with OS X.
 
 ------------------------------------------------
 
@@ -23,7 +26,7 @@ to use different cable types. Wiggler is the preferred choice.
 The cable hookups are as follows:
 
 	JTAG	   - Wiggler -	     Arduino		JTAG	   - Xilinx -	    Arduino
-	1  - nTRST —————————————————> 6 		1  - nTRST ——————————————————> X 
+	1  - nTRST ———————————-——————> 6 		1  - nTRST ——————————————————> X
 	3  - TDI ————————————————————> 5		3  - TDI ————————————————————> 2
 	5  - TDO ————————————————————> 7		5  - TDO ————————————————————> 5
 	7  - TMS ————————————————————> 3		7  - TMS ————————————————————> 4
@@ -54,5 +57,6 @@ tl_tjtag_tests is a test application that will test turing on the pins. So you c
 
 ------------------------------------------------
 
-As with the previous version this patch also runs very slow! It most likely is the latency experience with
+As with the previous version this patch also runs very slow! It most likely is the latency experienced with
 sending to, waiting for and finally receiving back from the Arduino.
+
