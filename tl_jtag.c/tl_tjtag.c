@@ -270,8 +270,6 @@ TLCString createArduinoFileString(void)
     const char *envior = getenv(TL_TJTAG__PORT);
     if(envior) file = TLCStringCreate(envior);
     
-    //TLCStringCreate("/dev/tty.usbserial-A603UE5O");
-    
     return file;
 }
 
