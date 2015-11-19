@@ -50,6 +50,8 @@
 int Arduino_FD = -1;
 #define iSSetup() (bool)(Arduino_FD >= 0)
 
+static const char * TL_TJTAG__PORT = "TL_TJTAG__PORT";
+
 #pragma mark - Arduino Interfacing Codes
 // Arduino Response Codes
 static const unsigned char R_SEND_SUCCESS = 0x4B;
@@ -88,7 +90,7 @@ typedef struct {
 
 typedef TLCString_t * TLCString;
 
-TL_ALWAYS_INLINE_STATIC TLCString TLCStringCreate(char *buffer) {
+TL_ALWAYS_INLINE_STATIC TLCString TLCStringCreate(const char *buffer) {
     TLCString string = NULL;
     if(!buffer) return NULL;
     // Be cautious about not flitting wildly through memory
@@ -261,9 +263,14 @@ bool set_arduino_cable(ArduinoCableType cable_type)
     return changed;
 }
 
-TLCString getArduinoFileName(void)
+// The returned string must be released
+TLCString createArduinoFileString(void)
 {
-    TLCString file = TLCStringCreate("/dev/tty.usbserial-A603UE5O");
+    TLCString file = NULL;
+    const char *envior = getenv(TL_TJTAG__PORT);
+    if(envior) file = TLCStringCreate(envior);
+    
+    //TLCStringCreate("/dev/tty.usbserial-A603UE5O");
     
     return file;
 }
@@ -276,7 +283,7 @@ bool tljtag_setup(void)
     
     if(iSSetup()) return false;
     
-    TLCString filename = getArduinoFileName();
+    TLCString filename = createArduinoFileString();
     
     if(filename) {
         Arduino_FD = setup_arduino_port(filename);
@@ -284,6 +291,9 @@ bool tljtag_setup(void)
         if(reset_arduino(Arduino_FD)) {
             success = true;
         }
+    } else {
+        printf("Valid port not set with TL_TJTAG_PORT!\n");
+        exit(EXIT_FAILURE);
     }
     
     TLCStringFree(filename);
