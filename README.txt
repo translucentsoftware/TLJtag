@@ -9,8 +9,6 @@ It is based heavily off the source code of JTMOD (https://github.com/zoobab/tjta
 The serial communication library portion was completely rewritten but the Arduino sketch only 
 had slight modifications for clarity and cable selection.
 
-The JTMOD and tjtag source tree this patch was based off has been included.
-
 ------------------------------------------------
 
 - OS X only
