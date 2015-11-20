@@ -323,11 +323,8 @@ ArduinoCableType currentCableType(void)
 
 bool tljtag_set_cable(ArduinoCableType type)
 {
-    // If we are requesting the current type just return true
-    if(CurrCableType == type) return true;
-    
     // Check that we have a valid type
-    if(CurrCableType != type && (type == Wiggler_Cable_Type || type == Xilinx_Cable_Type)) {
+    if((type == Wiggler_Cable_Type || type == Xilinx_Cable_Type)) {
         return set_arduino_cable(type);
     }
     
