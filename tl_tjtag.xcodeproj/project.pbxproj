@@ -35,15 +35,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag.c; path = tl_jtag.c/tl_tjtag.c; sourceTree = "<group>"; };
-		031AB3A21BF8BBE70081F7CC /* tl_tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tl_tjtag.h; path = tl_jtag.c/tl_tjtag.h; sourceTree = "<group>"; };
+		031AB3A11BF8BBE70081F7CC /* tl_tjtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag.c; path = tl_jtag/tl_tjtag.c; sourceTree = "<group>"; };
+		031AB3A21BF8BBE70081F7CC /* tl_tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tl_tjtag.h; path = tl_jtag/tl_tjtag.h; sourceTree = "<group>"; };
 		032DCBB51BFBAF8500A59410 /* spi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi.h; sourceTree = "<group>"; };
 		032DCBB61BFBAF8500A59410 /* tjtag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tjtag.c; sourceTree = "<group>"; };
 		032DCBB71BFBAF8500A59410 /* tjtag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tjtag.h; sourceTree = "<group>"; };
 		038B5CF21BF2966F00BC9A2A /* tl_tjtag */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag; sourceTree = BUILT_PRODUCTS_DIR; };
 		038B5D041BF296F100BC9A2A /* tl_tjtag_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_tjtag_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		03A4F0AB1BFE180D00E91D5B /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
-		03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag_test.c; path = tl_jtag.c/tl_tjtag_test.c; sourceTree = "<group>"; };
+		03D5B03B1BF9316200BBF5A1 /* tl_tjtag_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tl_tjtag_test.c; path = tl_jtag/tl_tjtag_test.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
