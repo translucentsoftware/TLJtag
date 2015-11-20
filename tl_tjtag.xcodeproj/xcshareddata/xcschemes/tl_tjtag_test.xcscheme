@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "038B5D031BF296F100BC9A2A"
-               BuildableName = "tl_jtag_test"
+               BuildableName = "tl_tjtag_test"
                BlueprintName = "tl_tjtag_test"
                ReferencedContainer = "container:tl_tjtag.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "038B5D031BF296F100BC9A2A"
-            BuildableName = "tl_jtag_test"
+            BuildableName = "tl_tjtag_test"
             BlueprintName = "tl_tjtag_test"
             ReferencedContainer = "container:tl_tjtag.xcodeproj">
          </BuildableReference>
@@ -56,7 +56,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "038B5D031BF296F100BC9A2A"
-            BuildableName = "tl_jtag_test"
+            BuildableName = "tl_tjtag_test"
             BlueprintName = "tl_tjtag_test"
             ReferencedContainer = "container:tl_tjtag.xcodeproj">
          </BuildableReference>
@@ -75,7 +75,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "038B5D031BF296F100BC9A2A"
-            BuildableName = "tl_jtag_test"
+            BuildableName = "tl_tjtag_test"
             BlueprintName = "tl_tjtag_test"
             ReferencedContainer = "container:tl_tjtag.xcodeproj">
          </BuildableReference>
