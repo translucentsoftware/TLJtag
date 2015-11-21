@@ -201,6 +201,18 @@ OUT:
     
 }
 
+void reset_hard_arduino(void)
+{
+    if(Arduino_FD >= 0) {
+        // The Arduino is reset by sending the Data Terminal Ready low then high
+        int error = 0;
+        error = ioctl(Arduino_FD, TIOCCDTR);
+        WaitForArduino();
+        error = ioctl(Arduino_FD, TIOCSDTR);
+        WaitForArduino();
+    }
+}
+
 bool reset_arduino(int fd) {
     bool was_reset = false;
     int tries = 0;
