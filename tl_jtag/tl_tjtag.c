@@ -67,11 +67,11 @@ static unsigned char Arduino_Reset = 0x0;
 
 static speed_t BAUDRATE = B9600;
 static const int Arduino_Wait = 5; // The number of wait cycles for reading
-// The wait we should expect the for the Arduino
-// It does not seem to like to exceed 9600 baud
-// This wait gives the Arduino enough time to receive the byte,
-// process it and send something back. Doesn't seem to be able to be
-// lower as at 30 causes errors after a short while
+                                   // The wait we should expect the for the Arduino
+                                   // It does not seem to like to exceed 9600 baud
+                                   // This wait gives the Arduino enough time to receive the byte,
+                                   // process it and send something back. Doesn't seem to be able to be
+                                   // lower as at 30 causes errors after a short while
 #define Arduino_Delay (int)((1000000 / BAUDRATE) * 40)
 
 // The underlying cable type, on the Arduino it defaults to
@@ -285,6 +285,50 @@ TLCString createArduinoFileString(void)
     return file;
 }
 
+void handleTermSignal(int sig)
+{
+    switch (sig) {
+        case SIGTERM:
+        case SIGINT:
+        case SIGQUIT:
+        case SIGHUP:
+            tljtag_shutdown();
+            printf("\n\nShutting Down\n");
+            exit(EXIT_SUCCESS);
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void setupSignalHandler(void)
+{
+    if(SIG_ERR == signal(SIGTERM, handleTermSignal)) {
+        printf("Unable to listen for the termination signal!\n");
+    }
+    
+    if(SIG_ERR == signal(SIGINT, handleTermSignal)) {
+        printf("Unable to listen for the interrupt signal!\n");
+    }
+    
+    if(SIG_ERR == signal(SIGQUIT, handleTermSignal)) {
+        printf("Unable to listen for the quit signal!\n");
+    }
+    
+    if(SIG_ERR == signal(SIGHUP, handleTermSignal)) {
+        printf("Unable to listen for the hang up signal!\n");
+    }
+}
+
+void removeSignalHandler(void)
+{
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    signal(SIGHUP, SIG_DFL);
+}
+
 
 #pragma mark - Public Functions
 bool tljtag_setup(void)
@@ -308,6 +352,8 @@ bool tljtag_setup(void)
     
     TLCStringFree(filename);
     
+    setupSignalHandler();
+    
     return success;
 }
 
@@ -322,8 +368,11 @@ bool tljtag_setup_cable_type(int wiggler)
     
     success = tljtag_set_cable((wiggler ? Wiggler_Cable_Type : Xilinx_Cable_Type));
     
-    if(!success) // We have a valid setup but can not change the cable type
+    if(!success) {// We have a valid setup but can not change the cable type
         tljtag_shutdown();
+        printf("Unable to set the cable type\n");
+        exit(EXIT_FAILURE); // The caller may not correctly exit
+    }
     
     return success;
 }
@@ -363,7 +412,7 @@ bool tljtag_send_byte(unsigned char byte)
     
     
     if(bytesread < 0) {
-        printf("Invalid Response Code Reading From Arduino %c\n", *buffer);
+        printf("Unable To Send To The Arduino\n");
         exit(EXIT_FAILURE);
     } else {
         success = true;
@@ -389,7 +438,7 @@ char tljtag_receive_byte(void)
     bytesread = read_until(Arduino_FD, &output, 1, 0, Arduino_Wait);
     
     if(bytesread < 0) {
-        printf("Error receiving from Arduino\n");
+        printf("Error Receiving From The Arduino\n");
         exit(EXIT_FAILURE);
     }
     
@@ -401,7 +450,8 @@ char tljtag_receive_byte(void)
 void tljtag_shutdown(void)
 {
     if(iSSetup()) {
-        reset_arduino(Arduino_FD);
+        removeSignalHandler();
+        reset_hard_arduino(); // We will reset the Arduino on startup but this makes thing predicatable
         close(Arduino_FD), Arduino_FD = -1;
     }
 }

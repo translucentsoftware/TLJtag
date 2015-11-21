@@ -34,6 +34,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <stdbool.h>
+#include <signal.h>
 
 typedef enum {
     Xilinx_Cable_Type = 1,
