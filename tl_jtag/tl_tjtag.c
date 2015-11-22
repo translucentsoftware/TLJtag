@@ -63,6 +63,8 @@
 int Arduino_FD = -1;
 #define iSSetup() (bool)(Arduino_FD >= 0)
 
+static const int ErrTimeOut = -2;
+
 static const char * TL_TJTAG__PORT = "TL_TJTAG__PORT";
 
 #pragma mark - Arduino Interfacing Codes
@@ -129,6 +131,9 @@ char * TLCStringChar(TLCString string) { return string ? string->string : NULL; 
 TL_ALWAYS_INLINE_STATIC
 void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(string->string), string->string = NULL; } free(string); }}
 
+
+#pragma mark - Private Functions
+
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
     unsigned char buffer[1];
     ssize_t bytesread = 0;
@@ -139,12 +144,12 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     
     do {
         bytesread = read(fd, buffer, 1);
+
         if (unlikely(-1 == bytesread)) return -1;
-        
         if(0 == bytesread) {
             usleep(Arduino_Delay);
             timeout--;
-            if(timeout == 0) return -2;
+            if(timeout == 0) return ErrTimeOut;
             continue;
         }
         
@@ -159,12 +164,30 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     return 0;
 }
 
-#pragma mark - Private Functions
-
 // Delay to give the Arduino adequate processing time
 TL_ALWAYS_INLINE_STATIC void WaitForArduino(void)
 {
     usleep(Arduino_Delay);
+}
+
+TL_ALWAYS_INLINE_STATIC
+void flushSerialLine(void)
+{
+    if(Arduino_FD >= 0) tcflush(Arduino_FD, TCSAFLUSH);
+}
+
+void drainSerialLine(void)
+{
+    ssize_t bytesread = 0;
+    unsigned char buffer[64];
+    
+    // Drain any built-up messages from sends
+    do {
+        bytesread = read_until(Arduino_FD, buffer, 64, 0, Arduino_Wait);
+        if(bytesread > 0)
+            printf("Drained %ld Bytes\n", bytesread);
+    } while (bytesread > 0);
+
 }
 
 int setup_arduino_port(TLCString file)
@@ -308,7 +331,7 @@ void handleTermSignal(int sig)
         case SIGQUIT:
         case SIGHUP:
             tljtag_shutdown();
-            printf("\n\nShutting Down\n");
+            printf("\n\nShutting Down........\n\n");
             exit(EXIT_SUCCESS);
             break;
             
@@ -458,6 +481,7 @@ char tljtag_receive_byte(void)
         
         output ^= 0x80; // From JTMod
     }
+
     return output;
 }
 
