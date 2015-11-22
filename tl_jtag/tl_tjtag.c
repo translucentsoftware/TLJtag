@@ -19,7 +19,7 @@
 
 #include "tl_tjtag.h"
 
-#pragma mark - Compiler Directives
+#pragma mark - Compiler Directives -
 
 // Force the compiler to inline
 #define TL_INLINE_STATIC static __inline__
@@ -44,6 +44,19 @@
 
 #endif //__GNUC__
 
+#pragma mark - Branch Prediction Logic Macros -
+#if __has_builtin(__builtin_expect) || defined(__GNUC__)
+
+#define likely(x) ((typeof(x))__builtin_expect((long)(x), ~0l))
+#define unlikely(x) ((typeof(x))__builtin_expect((long)(x), 0l))
+
+#else
+#warning "This Compiler Does Not Support Builtin Expect"
+
+#define likely(x) (x)
+#define unlikely(x) (x)
+#endif
+
 
 #pragma mark - Globals
 
@@ -65,13 +78,13 @@ static unsigned char Arduino_Reset = 0x0;
 #define Arduino_Read (0x2 << LShiftP)
 #define Arduino_Cable_select (0x3 << LShiftP)
 
-static speed_t BAUDRATE = B9600;
+static const speed_t BAUDRATE = B9600;
 static const int Arduino_Wait = 5; // The number of wait cycles for reading
-                                   // The wait we should expect the for the Arduino
-                                   // It does not seem to like to exceed 9600 baud
-                                   // This wait gives the Arduino enough time to receive the byte,
-                                   // process it and send something back. Doesn't seem to be able to be
-                                   // lower as at 30 causes errors after a short while
+// The wait we should expect the for the Arduino
+// It does not seem to like to exceed 9600 baud
+// This wait gives the Arduino enough time to receive the byte,
+// process it and send something back. Doesn't seem to be able to be
+// lower as at 30 causes errors after a short while
 #define Arduino_Delay (int)((1000000 / BAUDRATE) * 40)
 
 // The underlying cable type, on the Arduino it defaults to
@@ -90,14 +103,15 @@ typedef struct {
 
 typedef TLCString_t * TLCString;
 
-TL_ALWAYS_INLINE_STATIC TLCString TLCStringCreate(const char *buffer) {
+TL_NOINLINE
+TLCString TLCStringCreate(const char *buffer) {
     TLCString string = NULL;
     if(!buffer) return NULL;
     // Be cautious about not flitting wildly through memory
     size_t length = strnlen(buffer, 512);
     if(length) {
         string = calloc(sizeof(TLCString_t), 1);
-        if(string && !(string->string = calloc(length, 1))) {
+        if(likely(string) && unlikely(!(string->string = calloc(length, 1)))) {
             free(string);
         } else {
             strncpy(string->string, buffer, length);
@@ -108,21 +122,24 @@ TL_ALWAYS_INLINE_STATIC TLCString TLCStringCreate(const char *buffer) {
     return string;
 }
 
-TL_ALWAYS_INLINE_STATIC size_t TLCStringLength(TLCString string) { return string ? string->length : 0; }
-TL_ALWAYS_INLINE_STATIC char * TLCStringChar(TLCString string) { return string ? string->string : NULL; }
-TL_ALWAYS_INLINE_STATIC void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(string->string); } free(string); }}
+TL_ALWAYS_INLINE_STATIC
+size_t TLCStringLength(TLCString string) { return string ? string->length : 0; }
+TL_ALWAYS_INLINE_STATIC
+char * TLCStringChar(TLCString string) { return string ? string->string : NULL; }
+TL_ALWAYS_INLINE_STATIC
+void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(string->string), string->string = NULL; } free(string); }}
 
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
     unsigned char buffer[1];
     ssize_t bytesread = 0;
     
-    if(fd < 0) return -1;
+    if(unlikely(fd < 0)) return -1;
     
     int i = 0;
     
     do {
         bytesread = read(fd, buffer, 1);
-        if (-1 == bytesread) return -1;;
+        if (unlikely(-1 == bytesread)) return -1;
         
         if(0 == bytesread) {
             usleep(Arduino_Delay);
@@ -162,14 +179,12 @@ int setup_arduino_port(TLCString file)
     
     fd = open( TLCStringChar(file), O_RDWR | O_NONBLOCK );
     
-    if(fd < 0) {
+    if(unlikely(fd < 0)) {
         printf("Failed to open file: %s", TLCStringChar(file));
         exit(EXIT_FAILURE);
     }
     
-    // Clear non-blocking flag
-    //  fcntl(fd, F_SETFL, 0);
-    
+    // Set tty speed to our baud rate
     cfsetispeed(&tty, BAUDRATE);
     cfsetospeed(&tty, BAUDRATE);
     
@@ -220,7 +235,7 @@ bool reset_arduino(int fd) {
     // from the reset, usually only needs two characters
     unsigned char buffer[8];
     
-    if(fd >=0) {
+    if(fd >= 0) {
         ssize_t bytesread = 0;
         
         while (was_reset == false) {
@@ -244,7 +259,7 @@ bool reset_arduino(int fd) {
         }
     }
     
-    if(!was_reset) {
+    if(unlikely(!was_reset)) {
         printf("Error reseting the Arduino\n");
         exit(EXIT_FAILURE);
     }
@@ -335,11 +350,11 @@ bool tljtag_setup(void)
 {
     bool success = false;
     
-    if(iSSetup()) return false;
+    if(unlikely(iSSetup())) return false;
     
     TLCString filename = createArduinoFileString();
     
-    if(filename) {
+    if(likely(filename)) {
         Arduino_FD = setup_arduino_port(filename);
         
         if(reset_arduino(Arduino_FD)) {
@@ -364,11 +379,11 @@ bool tljtag_setup_cable_type(int wiggler)
     bool success = false;
     success = tljtag_setup();
     
-    if(!success) return success;
+    if(unlikely(!success)) return success;
     
     success = tljtag_set_cable((wiggler ? Wiggler_Cable_Type : Xilinx_Cable_Type));
     
-    if(!success) {// We have a valid setup but can not change the cable type
+    if(unlikely(!success)) {// We have a valid setup but can not change the cable type
         tljtag_shutdown();
         printf("Unable to set the cable type\n");
         exit(EXIT_FAILURE); // The caller may not correctly exit
@@ -398,28 +413,27 @@ bool tljtag_send_byte(unsigned char byte)
     unsigned char buffer[1];
     ssize_t bytesread = 0;
     
-    if(!iSSetup()) goto OUT;
-    
-    // From JTMod
-    *buffer = byte & 0x1F;
-    *buffer |= 0x20;
-    
-    write(Arduino_FD, buffer, 1);
-    
-    WaitForArduino();
-    
-    bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait);
-    
-    
-    if(bytesread < 0) {
-        printf("Unable To Send To The Arduino\n");
-        exit(EXIT_FAILURE);
-    } else {
-        success = true;
+    if(likely(iSSetup())) {
+        
+        // From JTMod
+        *buffer = byte & 0x1F;
+        *buffer |= 0x20;
+        
+        write(Arduino_FD, buffer, 1);
+        
+        WaitForArduino();
+        
+        bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait);
+        
+        
+        if(unlikely(bytesread < 0)) {
+            printf("Unable To Send To The Arduino\n");
+            exit(EXIT_FAILURE);
+        } else {
+            success = true;
+        }
     }
     
-    
-OUT:
     return success;
 }
 
@@ -429,29 +443,29 @@ char tljtag_receive_byte(void)
     unsigned char output = Arduino_Read;
     ssize_t bytesread = 0;
     
-    
-    output = Arduino_Read;
-    write(Arduino_FD, &output, 1);
-    
-    WaitForArduino();
-    
-    bytesread = read_until(Arduino_FD, &output, 1, 0, Arduino_Wait);
-    
-    if(bytesread < 0) {
-        printf("Error Receiving From The Arduino\n");
-        exit(EXIT_FAILURE);
+    if(likely(iSSetup())) {
+        output = Arduino_Read;
+        write(Arduino_FD, &output, 1);
+        
+        WaitForArduino();
+        
+        bytesread = read_until(Arduino_FD, &output, 1, 0, Arduino_Wait);
+        
+        if(unlikely(bytesread < 0)) {
+            printf("Error Receiving From The Arduino\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        output ^= 0x80; // From JTMod
     }
-    
-    output ^= 0x80; // From JTMod
-    
     return output;
 }
 
 void tljtag_shutdown(void)
 {
-    if(iSSetup()) {
+    if(likely(iSSetup())) {
         removeSignalHandler();
-        reset_hard_arduino(); // We will reset the Arduino on startup but this makes thing predicatable
+        reset_hard_arduino(); // We will reset the Arduino on startup but this makes things predicatable
         close(Arduino_FD), Arduino_FD = -1;
     }
 }
