@@ -29,15 +29,17 @@ int main() {
     printf("Test Sending Bytes to the Arduino\n");
     for (byte = 0; byte < 32; byte++) {
         tljtag_send_byte(byte);
-        usleep(500 * 1000);
+        usleep(500000);
     }
     
     printf("Test Receiving Bytes from the Arduino\n");
     for (byte = 0; byte < 32; byte++) {
         unsigned char received = tljtag_receive_byte();
         //  printf("Received %c\n", received);
-        usleep(500 * 1000);
+        usleep(100000);
     }
+    
+    printf("Tests Finished!\n");
     
     tljtag_shutdown();
     
