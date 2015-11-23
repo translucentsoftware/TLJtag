@@ -67,6 +67,8 @@ static const int ErrTimeOut = -2;
 
 static const char * TL_TJTAG__PORT = "TL_TJTAG__PORT";
 
+#define MSEC_TO_USEC(msecs) (__typeof(msecs))(msecs * 1000)
+
 #pragma mark - Arduino Interfacing Codes
 // Arduino Response Codes
 static const unsigned char R_SEND_SUCCESS = 0x4B;
@@ -82,12 +84,11 @@ static unsigned char Arduino_Reset = 0x0;
 
 static const speed_t BAUDRATE = B9600;
 static const int Arduino_Wait = 5; // The number of wait cycles for reading
-// The wait we should expect the for the Arduino
-// It does not seem to like to exceed 9600 baud
-// This wait gives the Arduino enough time to receive the byte,
-// process it and send something back. Doesn't seem to be able to be
-// lower as at 30 causes errors after a short while
-#define Arduino_Delay (int)((1000000 / BAUDRATE) * 40)
+
+// Through testing it seems that 4 milliseconds is the minimum time required
+// before further operations can occur. It seems more to do with the device
+// that is being jtag'ed than with the Arduino, as eroneous data occurs with faster speeds.
+#define Arduino_Delay (int)(MSEC_TO_USEC(4))
 
 // The underlying cable type, on the Arduino it defaults to
 // the 4 pins TDI TDO TMS TCK
