@@ -12,7 +12,8 @@ had slight modifications for clarity and cable selection.
 ------------------------------------------------
 
 - Mac OS X only
-This patch only works on Mac OS X but still contains the modifications in tjtag from JTMOD.
+This patch only works on Mac OS X but should work on any POSIX compliant OS.
+All the original modifications in tjtag from JTMOD have been presevered.
 tjtag has also been patched in places to make it compatible with Mac OS X.
 
 ------------------------------------------------
