@@ -166,22 +166,23 @@ int read_until(int fd, unsigned char *out_buffer, const int max_len, const unsig
     unsigned int i = 0;
     
     do {
+        
         bytesread = read(fd, buffer, 1);
         
         if (unlikely(-1 == bytesread)) return -1;
+        
         if(0 == bytesread) {
             if(timeout == 0) return ErrTimeOut;
             timeout--;
             WaitForArduino();
-            continue;
+        } else {
+            out_buffer[i] = buffer[0];
+            i++;
+            if (READ_UNTIL_NO_STOP != stop && buffer[0] == stop) {
+                break;
+            }
         }
-        out_buffer[i] = buffer[0];
-        i++;
-        
-        if (READ_UNTIL_NO_STOP != stop && buffer[0] == stop) {
-            break;
-        }
-    } while (i < max_len && timeout > 0);
+    } while (i < max_len);
     
     return (int)bytesread;
 }
@@ -467,6 +468,7 @@ bool tljtag_send_byte(unsigned char byte)
     
     if(likely(iSSetup())) {
         flushSerialLine();
+        WaitForArduino();
         // From JTMod
         *buffer = byte & 0x1F;
         *buffer |= 0x20;
@@ -496,6 +498,7 @@ char tljtag_receive_byte(void)
     
     if(likely(iSSetup())) {
         flushSerialLine();
+        WaitForArduino();
         output = Arduino_Read;
         write(Arduino_FD, &output, 1);
         
