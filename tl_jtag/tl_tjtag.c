@@ -88,6 +88,9 @@ static const int Arduino_Wait = 5; // The number of wait cycles for reading
 // Through testing it seems that 4 milliseconds is the minimum time required
 // before further operations can occur. It seems more to do with the device
 // that is being jtag'ed than with the Arduino, as eroneous data occurs with faster speeds.
+/*
+ * Currently enabling optimizations in the compiler break this!
+ */
 #define Arduino_Delay (int)(MSEC_TO_USEC(4))
 
 // The underlying cable type, on the Arduino it defaults to
@@ -143,7 +146,7 @@ void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(st
 // The time out how many Arduino_Delay cycles it will wait for before timing out
 // returns -1 on error, -2 on timeout and 1+ to signify bytes received
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
-   
+    
     unsigned char buffer[1];
     volatile ssize_t bytesread = 0;
     
@@ -159,7 +162,7 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
             usleep(Arduino_Delay);
             timeout--;
             if(timeout == 0) return ErrTimeOut;
-            /* 
+            /*
              *  Safeguard to seperate from the if
              */
             continue;
@@ -177,7 +180,8 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
 }
 
 // Delay to give the Arduino adequate processing time
-TL_ALWAYS_INLINE_STATIC void WaitForArduino(void)
+TL_ALWAYS_INLINE_STATIC
+void WaitForArduino(void)
 {
     usleep(Arduino_Delay);
 }
@@ -212,10 +216,15 @@ int setup_arduino_port(TLCString file)
         goto OUT;
     }
     
-    fd = open( TLCStringChar(file), O_RDWR | O_NONBLOCK );
+    fd = open( TLCStringChar(file), O_RDWR | O_NOCTTY | O_NONBLOCK );
     
     if(unlikely(fd < 0)) {
         printf("Failed to open file: %s", TLCStringChar(file));
+        exit(EXIT_FAILURE);
+    }
+    
+    if(-1 == ioctl(fd, TIOCEXCL)) {
+        printf("Error setting exclusive rights to: %s\n", TLCStringChar(file));
         exit(EXIT_FAILURE);
     }
     
