@@ -140,8 +140,9 @@ void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(st
 #pragma mark - Private Functions
 
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
+   
     unsigned char buffer[1];
-    ssize_t bytesread = 0;
+    volatile ssize_t bytesread = 0;
     
     if(unlikely(fd < 0) || unlikely(!out_buffer) || unlikely(!max_len)) return -1;
     
@@ -155,6 +156,9 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
             usleep(Arduino_Delay);
             timeout--;
             if(timeout == 0) return ErrTimeOut;
+            /* 
+             *  Safeguard to seperate from the if
+             */
             continue;
         }
         
@@ -166,7 +170,7 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     
     
     
-    return 0;
+    return (int)bytesread;
 }
 
 // Delay to give the Arduino adequate processing time
