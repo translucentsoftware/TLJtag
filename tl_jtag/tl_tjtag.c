@@ -155,12 +155,12 @@ void WaitForArduino(void)
 
 // Reads from a non-blocking io source
 // until either it reaches the max length or the 'stop' character is encountered.
-// The time out how many Arduino_Delay cycles it will wait for before timing out
+// The timeout is how many Arduino_Delay cycles it will wait for before timing out
 // returns -1 on error, -2 on timeout and 1+ to signify bytes received
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
     
     unsigned char buffer[1];
-    volatile ssize_t bytesread = 0;
+    ssize_t bytesread = 0;
     
     if(unlikely(fd < 0) || unlikely(NULL == out_buffer) || unlikely(max_len < 1)) return -1;
     int i = 0;
