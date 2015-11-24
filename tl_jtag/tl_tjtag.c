@@ -83,7 +83,7 @@ static unsigned char Arduino_Reset = 0x0;
 #define Arduino_Cable_select (0x3 << LShiftP)
 
 static const speed_t BAUDRATE = B9600;
-static const int Arduino_Wait = 5; // The number of wait cycles for reading
+static const int Arduino_Wait_Cycles = 5; // The number of wait cycles for reading
 
 // Through testing it seems that 4 milliseconds is the minimum time required
 // before further operations can occur. It seems more to do with the device
@@ -157,13 +157,13 @@ void WaitForArduino(void)
 // until either it reaches the max length or the 'stop' character is encountered.
 // The timeout is how many Arduino_Delay cycles it will wait for before timing out
 // returns -1 on error, -2 on timeout and 1+ to signify bytes received
-int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
+int read_until(int fd, unsigned char *out_buffer, const int max_len, const unsigned char stop, unsigned int timeout) {
     
     unsigned char buffer[1];
     ssize_t bytesread = 0;
     
     if(unlikely(fd < 0) || unlikely(NULL == out_buffer) || unlikely(max_len < 1)) return -1;
-    int i = 0;
+    unsigned int i = 0;
     
     do {
         bytesread = read(fd, buffer, 1);
@@ -171,8 +171,8 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
         if (unlikely(-1 == bytesread)) return -1;
         if(0 == bytesread) {
             if(timeout == 0) return ErrTimeOut;
-            WaitForArduino();
             timeout--;
+            WaitForArduino();
             continue;
         }
         out_buffer[i] = buffer[0];
@@ -200,7 +200,7 @@ void drainSerialLine(void)
     
     // Drain any built-up messages from sends
     do {
-        bytesread = read_until(Arduino_FD, buffer, 64, READ_UNTIL_NO_STOP, Arduino_Wait);
+        bytesread = read_until(Arduino_FD, buffer, 64, READ_UNTIL_NO_STOP, Arduino_Wait_Cycles);
         if(bytesread > 0)
             printf("Drained %ld Bytes\n", bytesread);
     } while (bytesread > 0);
@@ -297,7 +297,7 @@ bool reset_arduino(int fd) {
             
             WaitForArduino();
             
-            bytesread = read_until(fd, buffer, 8, R_RESET_SUCCESS, Arduino_Wait);
+            bytesread = read_until(fd, buffer, 8, R_RESET_SUCCESS, Arduino_Wait_Cycles);
             
             if(bytesread < 0) {
                 // During setup the Arduino seems to need extra time
@@ -333,7 +333,7 @@ bool set_arduino_cable(ArduinoCableType cable_type)
     
     WaitForArduino();
     
-    changed = (read_until(Arduino_FD, &buffer, 1, READ_UNTIL_NO_STOP, Arduino_Wait) >= 0) ? true : false;
+    changed = (read_until(Arduino_FD, &buffer, 1, READ_UNTIL_NO_STOP, Arduino_Wait_Cycles) >= 0) ? true : false;
     
     if(changed && buffer & cable_type) {
         CurrCableType = cable_type;
@@ -475,7 +475,7 @@ bool tljtag_send_byte(unsigned char byte)
         
         WaitForArduino();
         
-        bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait);
+        bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait_Cycles);
         
         if(unlikely(bytesread < 1)) {
             printf("Unable To Send To The Arduino\n");
@@ -501,7 +501,7 @@ char tljtag_receive_byte(void)
         
         WaitForArduino();
         
-        bytesread = read_until(Arduino_FD, &output, 1, READ_UNTIL_NO_STOP, Arduino_Wait);
+        bytesread = read_until(Arduino_FD, &output, 1, READ_UNTIL_NO_STOP, Arduino_Wait_Cycles);
         
         if(unlikely(bytesread < 1)) {
             printf("Error Receiving From The Arduino\n");
