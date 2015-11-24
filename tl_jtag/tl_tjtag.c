@@ -143,7 +143,7 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     unsigned char buffer[1];
     ssize_t bytesread = 0;
     
-    if(unlikely(fd < 0)) return -1;
+    if(unlikely(fd < 0) || unlikely(!out_buffer) || unlikely(!max_len)) return -1;
     
     int i = 0;
     
