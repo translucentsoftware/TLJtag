@@ -170,14 +170,9 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
         
         if (unlikely(-1 == bytesread)) return -1;
         if(0 == bytesread) {
-
+            if(timeout == 0) return ErrTimeOut;
             WaitForArduino();
             timeout--;
-            
-            if(timeout == 0) return ErrTimeOut;
-            /*
-             *  Safeguard to seperate from the if
-             */
             continue;
         }
         out_buffer[i] = buffer[0];
