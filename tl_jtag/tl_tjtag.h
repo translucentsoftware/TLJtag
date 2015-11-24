@@ -17,10 +17,13 @@
 //
 // **************************************************************************
 
+#if !defined(__APPLE__)
+#error "This implementation has only been tested on Macintosh!!"
+#endif /* __APPLE__ */
+
+
 #ifndef tl_tjtag_h
 #define tl_tjtag_h
-
-#ifdef __APPLE__
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -73,7 +76,4 @@ char tljtag_receive_byte(void);
 // Shutdown the connection to the Arduino
 void tljtag_shutdown(void);
 
-#else
-#error "This implementation has only been tested on Macintosh!!"
-#endif /* __APPLE__ */
 #endif /* tl_tjtag_h */

@@ -114,11 +114,15 @@ TLCString TLCStringCreate(const char *buffer) {
     size_t length = strnlen(buffer, 512);
     if(length) {
         string = calloc(sizeof(TLCString_t), 1);
-        if(likely(string) && unlikely(!(string->string = calloc(length, 1)))) {
-            free(string);
-        } else {
-            strncpy(string->string, buffer, length);
-            string->length = length;
+        
+        if(likely(string)) {
+            if(unlikely(NULL == (string->string = calloc(length, 1)))) {
+                free(string);
+                return NULL;
+            } else {
+                strncpy(string->string, buffer, length);
+                string->length = length;
+            }
         }
     }
     
@@ -145,7 +149,7 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     
     do {
         bytesread = read(fd, buffer, 1);
-
+        
         if (unlikely(-1 == bytesread)) return -1;
         if(0 == bytesread) {
             usleep(Arduino_Delay);
@@ -188,7 +192,7 @@ void drainSerialLine(void)
         if(bytesread > 0)
             printf("Drained %ld Bytes\n", bytesread);
     } while (bytesread > 0);
-
+    
 }
 
 int setup_arduino_port(TLCString file)
@@ -482,7 +486,7 @@ char tljtag_receive_byte(void)
         
         output ^= 0x80; // From JTMod
     }
-
+    
     return output;
 }
 
