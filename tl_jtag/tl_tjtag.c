@@ -205,7 +205,7 @@ void drainSerialLine(void)
     
     // Drain any built-up messages from sends
     do {
-        bytesread = read_until(Arduino_FD, buffer, 64, 0, Arduino_Wait);
+        bytesread = read_until(Arduino_FD, buffer, 64, READ_UNTIL_NO_STOP, Arduino_Wait);
         if(bytesread > 0)
             printf("Drained %ld Bytes\n", bytesread);
     } while (bytesread > 0);
