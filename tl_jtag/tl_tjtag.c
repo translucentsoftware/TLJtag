@@ -138,7 +138,10 @@ void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(st
 
 
 #pragma mark - Private Functions
-
+// Reads from a non-blocking io source
+// until either it reaches the max length or the 'stop' character is encountered.
+// The time out how many Arduino_Delay cycles it will wait for before timing out
+// returns -1 on error, -2 on timeout and 1+ to signify bytes received
 int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const unsigned char stop, unsigned int timeout) {
    
     unsigned char buffer[1];
@@ -252,11 +255,16 @@ void reset_hard_arduino(void)
 {
     if(Arduino_FD >= 0) {
         // The Arduino is reset by sending the Data Terminal Ready low then high
-        int error = 0;
-        error = ioctl(Arduino_FD, TIOCCDTR);
+        int error1 = 0, error2 = 0;
+        error1 = ioctl(Arduino_FD, TIOCCDTR);
         WaitForArduino();
-        error = ioctl(Arduino_FD, TIOCSDTR);
+        error2 = ioctl(Arduino_FD, TIOCSDTR);
         WaitForArduino();
+        
+        if(error1 < 0 || error2 < 0) {
+            printf("Unable to reset Arduino");
+            return;
+        }
     }
 }
 
