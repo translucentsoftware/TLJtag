@@ -94,14 +94,7 @@ void loop(void)
     int value = Serial.read();
     unsigned char byte = value;
 
-  //  Serial.print("byte received: ");
- //   Serial.println(byte, HEX);
-
     unsigned char op = (byte & B01100000) >> 5 ;
-
- //   Serial.print("opcode interpreted: ");
- //   Serial.println(op, HEX);
-
 
     switch ( op )
     {
@@ -118,8 +111,6 @@ void loop(void)
             
         case OP_SEND:
             {
-             //   Serial.println("  OP_SEND");
-
                 // Set output pins to requested values.
                 PORTD = (unsigned char)( (byte & B00011111) << 2 );
 
@@ -168,7 +159,4 @@ void loop(void)
                 Serial.write(R_INVALID);
             }
     };
-
-    //Serial.println();
-    //Serial.println();
 }
