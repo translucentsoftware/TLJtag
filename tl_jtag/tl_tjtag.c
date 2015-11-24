@@ -88,9 +88,6 @@ static const int Arduino_Wait = 5; // The number of wait cycles for reading
 // Through testing it seems that 4 milliseconds is the minimum time required
 // before further operations can occur. It seems more to do with the device
 // that is being jtag'ed than with the Arduino, as eroneous data occurs with faster speeds.
-/*
- * Currently enabling optimizations in the compiler break this!
- */
 #define Arduino_Delay (int)(MSEC_TO_USEC(4))
 
 // The underlying cable type, on the Arduino it defaults to
@@ -102,6 +99,8 @@ static ArduinoCableType CurrCableType = Xilinx_Cable_Type;
 
 
 #pragma mark - String Functions
+// Simple string-esc character buffer
+// I dislike using straight buffers without a struct containing the length
 typedef struct {
     char * string;
     size_t length;
@@ -109,11 +108,13 @@ typedef struct {
 
 typedef TLCString_t * TLCString;
 
+// Create a TLCString from a character buffer
+// sadly in c we have to work with a raw buffer as some point
 TL_NOINLINE
 TLCString TLCStringCreate(const char *buffer) {
     TLCString string = NULL;
     if(!buffer) return NULL;
-    // Be cautious about not flitting wildly through memory
+    // Be cautious about flitting wildly through memory
     size_t length = strnlen(buffer, 512);
     if(length) {
         string = calloc(sizeof(TLCString_t), 1);
@@ -135,12 +136,23 @@ TLCString TLCStringCreate(const char *buffer) {
 TL_ALWAYS_INLINE_STATIC
 size_t TLCStringLength(TLCString string) { return string ? string->length : 0; }
 TL_ALWAYS_INLINE_STATIC
-char * TLCStringChar(TLCString string) { return string ? string->string : NULL; }
+char * TLCStringGetCharArray(TLCString string) { return string ? string->string : NULL; }
 TL_ALWAYS_INLINE_STATIC
 void TLCStringFree(TLCString string) { if(string) { if(string->string) { free(string->string), string->string = NULL; } free(string); }}
 
 
 #pragma mark - Private Functions
+// Delay to give the Arduino adequate processing time
+TL_ALWAYS_INLINE_STATIC
+void WaitForArduino(void)
+{
+    usleep(Arduino_Delay);
+}
+
+// If no stop character is desired, pass for stop char
+// We lose the DEL character but unlikely we would need it
+#define READ_UNTIL_NO_STOP 0xFF
+
 // Reads from a non-blocking io source
 // until either it reaches the max length or the 'stop' character is encountered.
 // The time out how many Arduino_Delay cycles it will wait for before timing out
@@ -150,8 +162,7 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
     unsigned char buffer[1];
     volatile ssize_t bytesread = 0;
     
-    if(unlikely(fd < 0) || unlikely(!out_buffer) || unlikely(!max_len)) return -1;
-    
+    if(unlikely(fd < 0) || unlikely(NULL == out_buffer) || unlikely(max_len < 1)) return -1;
     int i = 0;
     
     do {
@@ -159,31 +170,25 @@ int read_until(int fd, unsigned char *out_buffer, unsigned int max_len, const un
         
         if (unlikely(-1 == bytesread)) return -1;
         if(0 == bytesread) {
-            usleep(Arduino_Delay);
+
+            WaitForArduino();
             timeout--;
+            
             if(timeout == 0) return ErrTimeOut;
             /*
              *  Safeguard to seperate from the if
              */
             continue;
         }
-        
         out_buffer[i] = buffer[0];
-        
         i++;
         
-    } while (buffer[0] != stop && i < max_len && timeout > 0);
-    
-    
+        if (READ_UNTIL_NO_STOP != stop && buffer[0] == stop) {
+            break;
+        }
+    } while (i < max_len && timeout > 0);
     
     return (int)bytesread;
-}
-
-// Delay to give the Arduino adequate processing time
-TL_ALWAYS_INLINE_STATIC
-void WaitForArduino(void)
-{
-    usleep(Arduino_Delay);
 }
 
 TL_ALWAYS_INLINE_STATIC
@@ -192,6 +197,7 @@ void flushSerialLine(void)
     if(Arduino_FD >= 0) tcflush(Arduino_FD, TCSAFLUSH);
 }
 
+// If we have messages or other such we don't want to save and don't want to simply flush
 void drainSerialLine(void)
 {
     ssize_t bytesread = 0;
@@ -216,15 +222,15 @@ int setup_arduino_port(TLCString file)
         goto OUT;
     }
     
-    fd = open( TLCStringChar(file), O_RDWR | O_NOCTTY | O_NONBLOCK );
+    fd = open( TLCStringGetCharArray(file), O_RDWR | O_NOCTTY | O_NONBLOCK );
     
     if(unlikely(fd < 0)) {
-        printf("Failed to open file: %s", TLCStringChar(file));
+        printf("Failed to open file: %s", TLCStringGetCharArray(file));
         exit(EXIT_FAILURE);
     }
     
     if(-1 == ioctl(fd, TIOCEXCL)) {
-        printf("Error setting exclusive rights to: %s\n", TLCStringChar(file));
+        printf("Error setting exclusive rights to: %s\n", TLCStringGetCharArray(file));
         exit(EXIT_FAILURE);
     }
     
@@ -281,7 +287,7 @@ bool reset_arduino(int fd) {
     bool was_reset = false;
     int tries = 0;
     // Use 8 here because invariable we receive and old invalid number
-    // from the reset, usually only needs two characters
+    // from the reset, usually only needs two characters but be safe
     unsigned char buffer[8];
     
     if(fd >= 0) {
@@ -303,8 +309,9 @@ bool reset_arduino(int fd) {
                 // to properly read the reset request
                 if(tries++ < 5)
                     continue;
-            } else
+            } else {
                 was_reset = true;
+            }
         }
     }
     
@@ -324,13 +331,14 @@ bool set_arduino_cable(ArduinoCableType cable_type)
     if(cable_type != Wiggler_Cable_Type && cable_type != Xilinx_Cable_Type)
         return changed;
     
+    // Set the instruction and cable type
     unsigned char buffer = Arduino_Cable_select | cable_type;
     
     write(Arduino_FD, &buffer, 1);
     
     WaitForArduino();
     
-    changed = (read_until(Arduino_FD, &buffer, 1, 0, Arduino_Wait) >= 0) ? true : false;
+    changed = (read_until(Arduino_FD, &buffer, 1, READ_UNTIL_NO_STOP, Arduino_Wait) >= 0) ? true : false;
     
     if(changed && buffer & cable_type) {
         CurrCableType = cable_type;
@@ -463,7 +471,7 @@ bool tljtag_send_byte(unsigned char byte)
     ssize_t bytesread = 0;
     
     if(likely(iSSetup())) {
-        
+        flushSerialLine();
         // From JTMod
         *buffer = byte & 0x1F;
         *buffer |= 0x20;
@@ -474,8 +482,7 @@ bool tljtag_send_byte(unsigned char byte)
         
         bytesread = read_until(Arduino_FD, buffer, 1, R_SEND_SUCCESS, Arduino_Wait);
         
-        
-        if(unlikely(bytesread < 0)) {
+        if(unlikely(bytesread < 1)) {
             printf("Unable To Send To The Arduino\n");
             exit(EXIT_FAILURE);
         } else {
@@ -493,18 +500,20 @@ char tljtag_receive_byte(void)
     ssize_t bytesread = 0;
     
     if(likely(iSSetup())) {
+        flushSerialLine();
         output = Arduino_Read;
         write(Arduino_FD, &output, 1);
         
         WaitForArduino();
         
-        bytesread = read_until(Arduino_FD, &output, 1, 0, Arduino_Wait);
+        bytesread = read_until(Arduino_FD, &output, 1, READ_UNTIL_NO_STOP, Arduino_Wait);
         
-        if(unlikely(bytesread < 0)) {
+        if(unlikely(bytesread < 1)) {
             printf("Error Receiving From The Arduino\n");
             exit(EXIT_FAILURE);
         }
         
+        // Seems to be duplicated from tjtag
         output ^= 0x80; // From JTMod
     }
     
