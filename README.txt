@@ -1,8 +1,8 @@
 Translucent Software (Josh Gibson) patches to JTMOD and tjtag v3.0.1
 ------------------------------------------------
 
-These patches were done to create a usable Arduino jtag adapter for OS X.
-JTMOD was designed for linux and Windows but OS X required some significant changes
+These patches were done to create a usable Arduino jtag adapter for Mac OS X.
+JTMOD was designed for linux and Windows but Mac OS X required some significant changes
 in order for it to properly communicate with the Arduino and not have any communication errors.
 
 It is based heavily off the source code of JTMOD (https://github.com/zoobab/tjtag-arduino).
@@ -11,9 +11,9 @@ had slight modifications for clarity and cable selection.
 
 ------------------------------------------------
 
-- OS X only
-This patch only works on OS X but still contains the modifications in tjtag from JTMOD.
-tjtag has also been patched in places to make it compatible with OS X.
+- Mac OS X only
+This patch only works on Mac OS X but still contains the modifications in tjtag from JTMOD.
+tjtag has also been patched in places to make it compatible with Mac OS X.
 
 ------------------------------------------------
 
@@ -45,7 +45,7 @@ The ground pins 4 - 10 (Right side) need to be hooked up to the Arduino ground.
 
 ------------------------------------------------
 
-tl_tjtag is the OS X patched version of tjtag and accepts all of the same commands as tjtag
+tl_tjtag is the Mac OS X patched version of tjtag and accepts all of the same commands as tjtag
 
 The environment variable TL_TJTAG__PORT needs to be set to the Arduino port,
 it should be something like: /dev/tty.usbserial*
