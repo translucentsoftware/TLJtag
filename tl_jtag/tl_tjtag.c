@@ -468,7 +468,7 @@ bool tljtag_send_byte(unsigned char byte)
     
     if(likely(iSSetup())) {
         flushSerialLine();
-        WaitForArduino();
+
         // From JTMod
         *buffer = byte & 0x1F;
         *buffer |= 0x20;
@@ -498,7 +498,7 @@ char tljtag_receive_byte(void)
     
     if(likely(iSSetup())) {
         flushSerialLine();
-        WaitForArduino();
+
         output = Arduino_Read;
         write(Arduino_FD, &output, 1);
         
