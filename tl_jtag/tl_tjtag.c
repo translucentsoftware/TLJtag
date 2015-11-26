@@ -60,11 +60,10 @@
 
 #pragma mark - Globals
 
-int Arduino_FD = -1;
+static int Arduino_FD = -1;
 #define iSSetup() (bool)(Arduino_FD >= 0)
 
 static const int ErrTimeOut = -2;
-
 static const char * TL_TJTAG__PORT = "TL_TJTAG__PORT";
 
 #define MSEC_TO_USEC(msecs) (__typeof(msecs))(msecs * 1000)
@@ -76,8 +75,8 @@ static const unsigned char R_RESET_SUCCESS = 0x42;
 // static const unsigned char R_INVALID = 0x7F; // Not needed currently
 
 // Arduino Command Codes
-static unsigned char LShiftP = 5;
-static unsigned char Arduino_Reset = 0x0;
+static const unsigned char LShiftP = 5;
+static const unsigned char Arduino_Reset = 0x0;
 #define Arduino_Send (0x1 << LShiftP)
 #define Arduino_Read (0x2 << LShiftP)
 #define Arduino_Cable_select (0x3 << LShiftP)
@@ -414,7 +413,7 @@ bool tljtag_setup(void)
             success = true;
         }
     } else {
-        printf("Valid port not set with TL_TJTAG_PORT!\n");
+        printf("Valid port not set with %s!\n", TL_TJTAG__PORT);
         exit(EXIT_FAILURE);
     }
     

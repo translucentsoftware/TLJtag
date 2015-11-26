@@ -32,7 +32,7 @@ EJTAG version or probe the flash. It also seems unable to restart the processor 
 The cable hookups are as follows:
 
 	JTAG	   - Wiggler -	     Arduino		JTAG	   - Xilinx -	    Arduino
-	1  - nTRST ———————————-——————> 6 		1  - nTRST ——————————————————> X
+	1  - nTRST ——————————————————> 6 		1  - nTRST ——————————————————> X
 	3  - TDI ————————————————————> 5		3  - TDI ————————————————————> 2
 	5  - TDO ————————————————————> 7		5  - TDO ————————————————————> 5
 	7  - TMS ————————————————————> 3		7  - TMS ————————————————————> 4
@@ -52,8 +52,8 @@ The environment variable TL_TJTAG__PORT needs to be set to the Arduino port,
 it should be something like: /dev/tty.usbserial*
 
 Example:
-	~> set TL_TJTAG_PORT=/dev/tty.usbserial-A603UE5O
-	~> ./tl_tjtag -probeonly /wiggler
+	~> export TL_TJTAG_PORT=/dev/tty.usbserial-A603UE5O
+    :~ ./tl_tjtag -probeonly /wiggler
 
 ------------------------------------------------
 
