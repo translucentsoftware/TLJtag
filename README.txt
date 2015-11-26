@@ -52,8 +52,8 @@ The environment variable TL_TJTAG__PORT needs to be set to the Arduino port,
 it should be something like: /dev/tty.usbserial*
 
 Example:
-	~> export TL_TJTAG_PORT=/dev/tty.usbserial-A603UE5O
-    :~ ./tl_tjtag -probeonly /wiggler
+        :~ export TL_TJTAG_PORT=/dev/tty.usbserial-A603UE5O
+        :~ ./tl_tjtag -probeonly /wiggler
 
 ------------------------------------------------
 

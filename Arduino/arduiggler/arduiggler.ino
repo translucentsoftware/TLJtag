@@ -37,6 +37,9 @@ static const int Wiggler_Cable_Type = 2;
 
 static int CABLE_TYPE = Xilinx_Cable_Type;
 
+#define isWigglerCable ((CABLE_TYPE & Wiggler_Cable_Type))
+#define isXilinxCable ((CABLE_TYPE & Xilinx_Cable_Type))
+
 // Added Return Codes - JG
 static const int R_SEND_SUCCESS = 0x4B;
 static const int R_RESET_SUCCESS = 0x42;
@@ -125,7 +128,7 @@ void loop(void)
              //   Serial.println("  OP_READ");
 
                 unsigned char readByte = 0;
-                if(CABLE_TYPE & Wiggler_Cable_Type) {
+                if(isWigglerCable) {
                         readByte = digitalRead(WTDO) == HIGH ?     // WTDO
                                                     B10000000 :     // send back a 1 in bit 7
                                                     B00000000;      // send back a 0 in bit 7
