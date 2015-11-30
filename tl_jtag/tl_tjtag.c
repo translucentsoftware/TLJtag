@@ -68,6 +68,8 @@ static const char * TL_TJTAG__PORT = "TL_TJTAG__PORT";
 
 #define MSEC_TO_USEC(msecs) (__typeof(msecs))(msecs * 1000)
 
+#define TLDebugArduinoSerial 0
+
 #pragma mark - Arduino Interfacing Codes
 // Arduino Response Codes
 static const unsigned char R_SEND_SUCCESS = 0x4B;
@@ -192,17 +194,18 @@ void flushSerialLine(void)
     if(Arduino_FD >= 0) tcflush(Arduino_FD, TCSAFLUSH);
 }
 
-// If we have messages or other such we don't want to save and don't want to simply flush
+// If we have messages we want printed out,
+// i.e. Debug messages, we can print them here instead of flushing
 void drainSerialLine(void)
 {
     ssize_t bytesread = 0;
     unsigned char buffer[64];
     
-    // Drain any built-up messages from sends
+    // Drain any built-up messages
     do {
-        bytesread = read_until(Arduino_FD, buffer, 64, READ_UNTIL_NO_STOP, Arduino_Wait_Cycles);
+        bytesread = read_until(Arduino_FD, buffer, 64, '\0', Arduino_Wait_Cycles);
         if(bytesread > 0)
-            printf("Drained %ld Bytes\n", bytesread);
+            printf("%s\n", buffer);
     } while (bytesread > 0);
     
 }
@@ -261,7 +264,7 @@ OUT:
     
 }
 
-void reset_hard_arduino(void)
+void reset_arduino_hard(void)
 {
     if(Arduino_FD >= 0) {
         // The Arduino is reset by sending the Data Terminal Ready low then high
@@ -466,7 +469,11 @@ bool tljtag_send_byte(unsigned char byte)
     ssize_t bytesread = 0;
     
     if(likely(iSSetup())) {
+#if TLDebugArduinoSerial
+        drainSerialLine();
+#else
         flushSerialLine();
+#endif
 
         // From JTMod
         *buffer = byte & 0x1F;
@@ -496,7 +503,11 @@ char tljtag_receive_byte(void)
     ssize_t bytesread = 0;
     
     if(likely(iSSetup())) {
+#if TLDebugArduinoSerial
+        drainSerialLine();
+#else
         flushSerialLine();
+#endif
 
         output = Arduino_Read;
         write(Arduino_FD, &output, 1);
@@ -521,7 +532,7 @@ void tljtag_shutdown(void)
 {
     if(likely(iSSetup())) {
         removeSignalHandler();
-        reset_hard_arduino(); // We will reset the Arduino on startup but this makes things predicatable
+        reset_arduino_hard(); // We will reset the Arduino on startup but this makes things predicatable
         close(Arduino_FD), Arduino_FD = -1;
     }
 }
